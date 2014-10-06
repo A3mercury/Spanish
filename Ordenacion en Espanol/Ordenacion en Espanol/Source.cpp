@@ -23,7 +23,7 @@ const string eng[30] = {
 	"k", "l", "m", "n", "o",
 	"p", "q", "r", "s", "t",
 	"u", "v", "w", "x", "y",
-	"z", "a.", "b.", "c.", "d."
+	"z", "z{", "z|", "z}", "z~"
 };
 
 struct Node
@@ -68,33 +68,44 @@ void quicksort(vector<SpanishWord>& StringVector, int left, int right)
 void TranslateToEnglish(vector<SpanishWord>& StringVector)
 {
 	// for each word in vector
-	for (int i = 0; i < StringVector.size(); i++)
+	for (unsigned int i = 0; i < StringVector.size(); i++)
 	{
 		string spanishWord = StringVector.at(i).Value;
 		string newWord;
 		// for each letter in word
-		for (int j = 0; j < spanishWord.length(); j++)
+		for (unsigned int j = 0; j < spanishWord.length(); j++)
 		{
 			string letter = spanishWord.substr(j, 1);
 			// check 4 special cases "aa", "bb", "cc", "dd"
-			if (letter == "a")
+			bool isSpecialCase = false;
+			if (letter == "c")
 			{
 				if (spanishWord.substr(j, 2) == "ch")
+				{
 					letter = "ch";
+					isSpecialCase = true;
+				}
 			}
 			else if (letter == "~")
 			{
 				letter = "~n";
+				isSpecialCase = true;
 			}
 			else if (letter == "l")
 			{
 				if (spanishWord.substr(j, 2) == "ll")
-					letter == "ll";
+				{
+					letter = "ll";
+					isSpecialCase = true;
+				}
 			}
 			else if (letter == "r")
 			{
 				if (spanishWord.substr(j, 2) == "rr")
-					letter == "rr";
+				{
+					letter = "rr";
+					isSpecialCase = true;
+				}
 			}
 
 			// for each letter in esp[] and eng[] arrays
@@ -106,44 +117,52 @@ void TranslateToEnglish(vector<SpanishWord>& StringVector)
 					break;
 				}
 			}
+			if (isSpecialCase)
+			{
+				j++;
+				isSpecialCase = false;
+			}
 			newWord.append(letter);
 		}
 		StringVector.at(i).Value = newWord;
-		cout << StringVector.at(i).Value << endl;
 	}
 }
 
 void TranslateToSpanish(vector<SpanishWord>& StringVector)
 {
 	// for each word in vector
-	for (int i = 0; i < StringVector.size(); i++)
+	for (unsigned int i = 0; i < StringVector.size(); i++)
 	{
 		string englishWord = StringVector.at(i).Value;
 		string newWord;
 		// for each letter in word
-		for (int j = 0; j < englishWord.length(); j++)
+		for (unsigned int j = 0; j < englishWord.length(); j++)
 		{
 			string letter = englishWord.substr(j, 1);
 			// check 4 special cases "ch", "ll", "~n", "rr"
-			if (letter == "a")
+			bool isSpecialCase = false;
+			if (letter == "z")
 			{
-				if (englishWord.substr(j, 2) == "a.")
-					letter = "w";
-			}
-			else if (letter == "b")
-			{
-				if (englishWord.substr(j, 2) == "b.")
-					letter = "x";
-			}
-			else if (letter == "c")
-			{
-				if (englishWord.substr(j, 2) == "c.")
-					letter == "y";
-			}
-			else if (letter == "d")
-			{
-				if (englishWord.substr(j, 2) == "d.")
-					letter == "z";
+				if (englishWord.substr(j, 2) == "z{")
+				{
+					letter = "z{";
+					isSpecialCase = true;
+				}
+				else if (englishWord.substr(j, 2) == "z|")
+				{
+					letter = "z|";
+					isSpecialCase = true;
+				}
+				else if (englishWord.substr(j, 2) == "z}")
+				{
+					letter = "z}";
+					isSpecialCase = true;
+				}
+				else if (englishWord.substr(j, 2) == "z~")
+				{
+					letter = "z~";
+					isSpecialCase = true;
+				}
 			}
 
 			// for each letter in esp[] and eng[] arrays
@@ -155,17 +174,15 @@ void TranslateToSpanish(vector<SpanishWord>& StringVector)
 					break;
 				}
 			}
+			if (isSpecialCase)
+			{
+				j++;
+				isSpecialCase = false;
+			}
 			newWord.append(letter);
 		}
 		StringVector.at(i).Value = newWord;
 	}
-}
-
-void SortVector(vector<SpanishWord>& StringVector)
-{
-	TranslateToEnglish(StringVector);
-	//quicksort(StringVector, 0, StringVector.size() - 1);
-	TranslateToSpanish(StringVector);
 }
 
 void main()
@@ -192,9 +209,14 @@ void main()
 			}
 		}
 
-		SortVector(StringVector);
-		for (int i = 0; i < StringVector.size(); i++)
+		TranslateToEnglish(StringVector);
+		quicksort(StringVector, 0, StringVector.size() - 1);
+		TranslateToSpanish(StringVector);
+		for (unsigned int i = 0; i < StringVector.size(); i++)
+		{
 			fout << StringVector.at(i).Value << endl;
+			cout << StringVector.at(i).Value << endl;
+		}
 
 		fout.close();
 		fin.close();
